@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Work Hours Tracker</title>
+    <style>
+        :root {
+            --bg: #f2f2f7;
+            --card: #ffffff;
+            --text: #1c1c1e;
+            --text-secondary: #8e8e93;
+            --accent: #007aff;
+            --accent-light: #e8f2ff;
+            --green: #34c759;
+            --green-light: #e6f9ec;
+            --red: #ff3b30;
+            --red-light: #ffe5e3;
+            --orange: #ff9500;
+            --orange-light: #fff3e0;
+            --border: #e5e5ea;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 14px rgba(0,0,0,0.1);
+            --radius: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            background: var(--card);
+            padding: 16px 20px;
+            padding-top: max(16px, env(safe-area-inset-top));
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Week Navigation */
+        .week-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .week-nav-btn {
+            background: var(--accent-light);
+            color: var(--accent);
+            border: none;
+            border-radius: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .week-nav-btn:active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .week-nav-btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .week-nav-label {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .week-nav-label .year {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Summary Cards */
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 16px 20px;
+        }
+
+        .summary-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .summary-card .value.green { color: var(--green); }
+        .summary-card .value.red { color: var(--red); }
+        .summary-card .value.accent { color: var(--accent); }
+
+        /* Week Group */
+        .week-group {
+            margin: 8px 16px;
+        }
+
+        .week-header {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 4px 8px;
+        }
+
+        /* Day Card */
+        .day-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        .day-card.expanded {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .day-card.today {
+            border: 2px solid var(--accent);
+        }
+
+        .day-card.empty-day {
+            opacity: 0.7;
+        }
+
+        .day-main {
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .day-info {
+            flex: 1;
+        }
+
+        .day-name {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .day-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .day-hours {
+            text-align: right;
+        }
+
+        .hours-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .hours-value.positive { color: var(--green); }
+        .hours-value.negative { color: var(--red); }
+        .hours-value.neutral { color: var(--text-secondary); }
+
+        .hours-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            margin-left: 12px;
+            color: var(--text-secondary);
+            transition: transform 0.25s;
+        }
+
+        .day-card.expanded .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Expanded Details */
+        .day-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+
+        .day-card.expanded .day-details {
+            max-height: 600px;
+        }
+
+        .details-inner {
+            padding: 0 16px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .time-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .time-row:last-child {
+            border-bottom: none;
+        }
+
+        .time-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-label .icon {
+            font-size: 18px;
+        }
+
+        .time-input {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-light);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 120px;
+            text-align: center;
+            font-family: inherit;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .time-input:focus {
+            outline: 2px solid var(--accent);
+            background: #fff;
+        }
+
+        .time-input.empty {
+            color: var(--text-secondary);
+            background: var(--bg);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        .status-badge.on-track {
+            background: var(--green-light);
+            color: var(--green);
+        }
+
+        .status-badge.behind {
+            background: var(--red-light);
+            color: var(--red);
+        }
+
+        .status-badge.ahead {
+            background: var(--orange-light);
+            color: var(--orange);
+        }
+
+        .status-badge.empty {
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        /* Floating Action */
+        .fab-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
+        }
+
+        .fab {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s, opacity 0.15s;
+            white-space: nowrap;
+        }
+
+        .fab:active {
+            transform: scale(0.96);
+        }
+
+        .fab.secondary {
+            background: var(--card);
+            color: var(--accent);
+        }
+
+        .fab.add-week {
+            background: var(--green);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--text);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 300;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000;
+                --card: #1c1c1e;
+                --text: #ffffff;
+                --text-secondary: #8e8e93;
+                --border: #38383a;
+                --accent-light: #1a2a3a;
+                --green-light: #1a2e1a;
+                --red-light: #2e1a1a;
+                --orange-light: #2e241a;
+            }
+        }
+
+        /* Week hours bar */
+        .week-bar-container {
+            padding: 0 20px 8px;
+        }
+
+        .week-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .week-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .week-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Work Hours</h1>
+        <div class="header-subtitle" id="headerSubtitle">Loading...</div>
+    </div>
+
+    <!-- Week Navigation -->
+    <div class="week-nav">
+        <button class="week-nav-btn" id="prevWeekBtn" onclick="navigateWeek(-1)">&#x2039;</button>
+        <div class="week-nav-label" id="weekNavLabel">
+            <span id="weekNavDates"></span><br>
+            <span class="year" id="weekNavYear"></span>
+        </div>
+        <button class="week-nav-btn" id="nextWeekBtn" onclick="navigateWeek(1)">&#x203A;</button>
+    </div>
+
+    <div class="summary-row" id="summaryRow">
+        <div class="summary-card">
+            <div class="label">This Week</div>
+            <div class="value accent" id="weekHours">--</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Week +/−</div>
+            <div class="value" id="weekBalance">--</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total Hours</div>
+            <div class="value green" id="totalHours">--</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Avg / Day</div>
+            <div class="value" id="avgHours">--</div>
+        </div>
+    </div>
+
+    <div class="week-bar-container">
+        <div class="week-bar">
+            <div class="week-bar-fill" id="weekBarFill" style="width: 0%"></div>
+        </div>
+        <div class="week-bar-label">
+            <span>0h</span>
+            <span id="weekBarTarget">Target: 38h</span>
+        </div>
+    </div>
+
+    <div id="scheduleContainer"></div>
+
+    <div class="fab-container">
+        <button class="fab secondary" onclick="resetData()">
+            <span>&#x21bb;</span> Reset
+        </button>
+        <button class="fab add-week" onclick="addWeek()">
+            <span>+</span> Add Week
+        </button>
+        <button class="fab" onclick="saveData()">
+            <span>&#x2713;</span> Save
+        </button>
+    </div>
+
+    <div class="toast" id="toast">Saved!</div>
+
+    <script>
+        const DEFAULT_DATA = [
+            {date:"2026-01-05",dayName:"Monday",defaultFinish:"18:56",workStart:"10:30",lunchStart:"14:19",lunchEnd:"15:09",endTime:"19:00",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-01-06",dayName:"Tuesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:08",lunchEnd:"15:08",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-01-07",dayName:"Wednesday",defaultFinish:"18:57",workStart:"10:23",lunchStart:"14:20",lunchEnd:"15:18",endTime:"18:57",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-01-08",dayName:"Thursday",defaultFinish:"18:55",workStart:"10:21",lunchStart:"15:28",lunchEnd:"16:26",endTime:"18:56",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-01-09",dayName:"Friday",defaultFinish:"19:00",workStart:"10:25",lunchStart:"15:11",lunchEnd:"16:10",endTime:"19:00",hoursWorked:27360,hoursLeft:-300},
+            {date:"2026-01-12",dayName:"Monday",defaultFinish:"18:59",workStart:"10:23",lunchStart:"15:02",lunchEnd:"16:02",endTime:"19:29",hoursWorked:29160,hoursLeft:1800},
+            {date:"2026-01-13",dayName:"Tuesday",defaultFinish:"19:03",workStart:"10:27",lunchStart:"13:58",lunchEnd:"14:58",endTime:"18:58",hoursWorked:27060,hoursLeft:-300},
+            {date:"2026-01-14",dayName:"Wednesday",defaultFinish:"19:00",workStart:"10:28",lunchStart:"14:33",lunchEnd:"15:29",endTime:"19:03",hoursWorked:27540,hoursLeft:180},
+            {date:"2026-01-15",dayName:"Thursday",defaultFinish:"18:58",workStart:"10:20",lunchStart:"15:55",lunchEnd:"16:57",endTime:"19:02",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-01-16",dayName:"Friday",defaultFinish:"19:04",workStart:"10:29",lunchStart:"15:46",lunchEnd:"16:45",endTime:"19:00",hoursWorked:27120,hoursLeft:-1680},
+            {date:"2026-01-19",dayName:"Monday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:31",lunchEnd:"15:31",endTime:"19:25",hoursWorked:28860,hoursLeft:1500},
+            {date:"2026-01-20",dayName:"Tuesday",defaultFinish:"18:19",workStart:"10:13",lunchStart:"14:59",lunchEnd:"15:29",endTime:"18:15",hoursWorked:27120,hoursLeft:-240},
+            {date:"2026-01-21",dayName:"Wednesday",defaultFinish:"18:59",workStart:"10:23",lunchStart:"15:37",lunchEnd:"16:37",endTime:"19:02",hoursWorked:27540,hoursLeft:180},
+            {date:"2026-01-22",dayName:"Thursday",defaultFinish:"19:02",workStart:"10:26",lunchStart:"14:56",lunchEnd:"15:56",endTime:"18:44",hoursWorked:26280,hoursLeft:-1080},
+            {date:"2026-01-23",dayName:"Friday",defaultFinish:"19:02",workStart:"10:26",lunchStart:"14:51",lunchEnd:"15:51",endTime:"18:59",hoursWorked:27180,hoursLeft:-180},
+            {date:"2026-01-26",dayName:"Monday",defaultFinish:"18:58",workStart:"10:23",lunchStart:"14:00",lunchEnd:"14:59",endTime:"19:30",hoursWorked:29280,hoursLeft:1920},
+            {date:"2026-01-27",dayName:"Tuesday",defaultFinish:"18:56",workStart:"10:24",lunchStart:"14:26",lunchEnd:"15:22",endTime:"18:47",hoursWorked:26820,hoursLeft:-540},
+            {date:"2026-01-28",dayName:"Wednesday",defaultFinish:"18:49",workStart:"10:17",lunchStart:"14:37",lunchEnd:"15:33",endTime:"19:08",hoursWorked:28500,hoursLeft:1140},
+            {date:"2026-01-29",dayName:"Thursday",defaultFinish:"18:55",workStart:"10:26",lunchStart:"14:24",lunchEnd:"15:17",endTime:"18:15",hoursWorked:24960,hoursLeft:-2400},
+            {date:"2026-01-30",dayName:"Friday",defaultFinish:"18:57",workStart:"10:21",lunchStart:"14:00",lunchEnd:"15:00",endTime:"19:00",hoursWorked:27540,hoursLeft:-300},
+            {date:"2026-02-02",dayName:"Monday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:14",lunchEnd:"15:14",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-02-03",dayName:"Tuesday",defaultFinish:"18:59",workStart:"10:24",lunchStart:"13:59",lunchEnd:"14:58",endTime:"18:44",hoursWorked:26460,hoursLeft:-900},
+            {date:"2026-02-04",dayName:"Wednesday",defaultFinish:"18:56",workStart:"10:20",lunchStart:"15:42",lunchEnd:"16:42",endTime:"19:03",hoursWorked:27780,hoursLeft:420},
+            {date:"2026-02-05",dayName:"Thursday",defaultFinish:"18:57",workStart:"10:21",lunchStart:"14:23",lunchEnd:"15:23",endTime:"18:45",hoursWorked:26640,hoursLeft:-720},
+            {date:"2026-02-06",dayName:"Friday",defaultFinish:"18:48",workStart:"10:16",lunchStart:"16:50",lunchEnd:"17:46",endTime:"19:20",hoursWorked:29280,hoursLeft:-720},
+            {date:"2026-02-09",dayName:"Monday",defaultFinish:"18:42",workStart:"10:06",lunchStart:"16:24",lunchEnd:"17:24",endTime:"19:03",hoursWorked:28620,hoursLeft:1260},
+            {date:"2026-02-10",dayName:"Tuesday",defaultFinish:"18:58",workStart:"10:24",lunchStart:"15:00",lunchEnd:"15:58",endTime:"18:45",hoursWorked:26580,hoursLeft:-780},
+            {date:"2026-02-11",dayName:"Wednesday",defaultFinish:"18:48",workStart:"10:14",lunchStart:"16:20",lunchEnd:"17:18",endTime:"19:00",hoursWorked:28080,hoursLeft:720},
+            {date:"2026-02-12",dayName:"Thursday",defaultFinish:"18:51",workStart:"10:15",lunchStart:"15:03",lunchEnd:"16:03",endTime:"18:45",hoursWorked:27000,hoursLeft:-360},
+            {date:"2026-02-13",dayName:"Friday",defaultFinish:"19:03",workStart:"10:24",lunchStart:"17:12",lunchEnd:"18:15",endTime:"19:09",hoursWorked:27720,hoursLeft:-1200},
+            {date:"2026-02-16",dayName:"Monday",defaultFinish:"18:57",workStart:"10:23",lunchStart:"16:52",lunchEnd:"17:50",endTime:"19:02",hoursWorked:27660,hoursLeft:300},
+            {date:"2026-02-17",dayName:"Tuesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"15:13",lunchEnd:"16:13",endTime:"18:58",hoursWorked:27240,hoursLeft:-120},
+            {date:"2026-02-18",dayName:"Wednesday",defaultFinish:"18:58",workStart:"10:23",lunchStart:"15:03",lunchEnd:"16:02",endTime:"18:59",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-02-19",dayName:"Thursday",defaultFinish:"18:56",workStart:"10:22",lunchStart:"14:38",lunchEnd:"15:36",endTime:"19:02",hoursWorked:27720,hoursLeft:360},
+            {date:"2026-02-20",dayName:"Friday",defaultFinish:"19:00",workStart:"10:25",lunchStart:"16:50",lunchEnd:"17:49",endTime:"19:17",hoursWorked:28380,hoursLeft:-1620},
+            {date:"2026-02-23",dayName:"Monday",defaultFinish:"18:57",workStart:"10:23",lunchStart:"15:03",lunchEnd:"16:01",endTime:"19:01",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-02-24",dayName:"Tuesday",defaultFinish:"18:59",workStart:"10:23",lunchStart:"16:52",lunchEnd:"17:52",endTime:"19:18",hoursWorked:28500,hoursLeft:1140},
+            {date:"2026-02-25",dayName:"Wednesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:00",lunchEnd:"15:00",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-02-26",dayName:"Thursday",defaultFinish:"18:47",workStart:"10:21",lunchStart:"15:05",lunchEnd:"15:55",endTime:"18:57",hoursWorked:27960,hoursLeft:600},
+            {date:"2026-02-27",dayName:"Friday",defaultFinish:"19:00",workStart:"10:25",lunchStart:"17:31",lunchEnd:"18:30",endTime:"19:02",hoursWorked:27480,hoursLeft:-2100},
+            {date:"2026-03-02",dayName:"Monday",defaultFinish:"18:55",workStart:"10:22",lunchStart:"14:58",lunchEnd:"15:55",endTime:"19:03",hoursWorked:27840,hoursLeft:480},
+            {date:"2026-03-03",dayName:"Tuesday",defaultFinish:"18:51",workStart:"10:19",lunchStart:"15:12",lunchEnd:"16:08",endTime:"19:01",hoursWorked:27960,hoursLeft:600},
+            {date:"2026-03-04",dayName:"Wednesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:00",lunchEnd:"15:00",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-03-05",dayName:"Thursday",defaultFinish:"18:50",workStart:"10:15",lunchStart:"17:31",lunchEnd:"18:30",endTime:"19:06",hoursWorked:28320,hoursLeft:960},
+            {date:"2026-03-06",dayName:"Friday",defaultFinish:"18:56",workStart:"10:20",lunchStart:"15:02",lunchEnd:"16:02",endTime:"19:10",hoursWorked:28200,hoursLeft:-2880},
+            {date:"2026-03-09",dayName:"Monday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"16:05",lunchEnd:"17:05",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-03-10",dayName:"Tuesday",defaultFinish:"18:59",workStart:"10:24",lunchStart:"16:45",lunchEnd:"17:44",endTime:"19:17",hoursWorked:28440,hoursLeft:1080},
+            {date:"2026-03-11",dayName:"Wednesday",defaultFinish:"18:59",workStart:"10:24",lunchStart:"15:27",lunchEnd:"16:26",endTime:"19:00",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-03-12",dayName:"Thursday",defaultFinish:"18:58",workStart:"10:22",lunchStart:"15:50",lunchEnd:"16:50",endTime:"18:58",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-03-13",dayName:"Friday",defaultFinish:"18:56",workStart:"10:22",lunchStart:"15:08",lunchEnd:"16:06",endTime:"19:16",hoursWorked:28560,hoursLeft:-2340},
+            {date:"2026-03-16",dayName:"Monday",defaultFinish:"18:57",workStart:"10:21",lunchStart:"15:02",lunchEnd:"16:02",endTime:"19:15",hoursWorked:28440,hoursLeft:1080},
+            {date:"2026-03-17",dayName:"Tuesday",defaultFinish:"18:58",workStart:"10:23",lunchStart:"15:00",lunchEnd:"15:59",endTime:"18:50",hoursWorked:26880,hoursLeft:-480},
+            {date:"2026-03-18",dayName:"Wednesday",defaultFinish:"18:29",workStart:"09:56",lunchStart:"14:57",lunchEnd:"15:54",endTime:"18:29",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-03-19",dayName:"Thursday",defaultFinish:"18:58",workStart:"10:22",lunchStart:"17:11",lunchEnd:"18:11",endTime:"18:59",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-03-20",dayName:"Friday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"16:29",lunchEnd:"17:29",endTime:"19:02",hoursWorked:27480,hoursLeft:-780},
+            {date:"2026-03-23",dayName:"Monday",defaultFinish:"18:58",workStart:"10:22",lunchStart:"15:05",lunchEnd:"16:05",endTime:"19:00",hoursWorked:27480,hoursLeft:120},
+            {date:"2026-03-24",dayName:"Tuesday",defaultFinish:"19:03",workStart:"10:23",lunchStart:"15:30",lunchEnd:"16:34",endTime:"19:01",hoursWorked:27240,hoursLeft:-120},
+            {date:"2026-03-25",dayName:"Wednesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"15:19",lunchEnd:"16:19",endTime:"18:55",hoursWorked:27060,hoursLeft:-300},
+            {date:"2026-03-26",dayName:"Thursday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"14:55",lunchEnd:"15:55",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-03-27",dayName:"Friday",defaultFinish:"19:45",workStart:"10:25",lunchStart:"15:16",lunchEnd:"17:00",endTime:"19:45",hoursWorked:27360,hoursLeft:300},
+            {date:"2026-03-30",dayName:"Monday",defaultFinish:"18:59",workStart:"10:23",lunchStart:"14:15",lunchEnd:"15:15",endTime:"19:00",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-03-31",dayName:"Tuesday",defaultFinish:"19:00",workStart:"10:24",lunchStart:"15:46",lunchEnd:"16:46",endTime:"19:00",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-04-01",dayName:"Wednesday",defaultFinish:"18:59",workStart:"10:25",lunchStart:"15:29",lunchEnd:"16:27",endTime:"19:00",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-04-02",dayName:"Thursday",defaultFinish:"19:03",workStart:"10:24",lunchStart:"16:30",lunchEnd:"17:33",endTime:"19:00",hoursWorked:27180,hoursLeft:-180},
+            {date:"2026-04-03",dayName:"Friday",defaultFinish:"18:56",workStart:"10:20",lunchStart:"16:09",lunchEnd:"17:09",endTime:"18:58",hoursWorked:27480,hoursLeft:-60},
+            {date:"2026-04-06",dayName:"Monday",defaultFinish:"16:27",workStart:"07:53",lunchStart:"14:02",lunchEnd:"15:00",endTime:"16:31",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-04-07",dayName:"Tuesday",defaultFinish:"16:32",workStart:"07:58",lunchStart:"13:54",lunchEnd:"14:52",endTime:"16:47",hoursWorked:28260,hoursLeft:900},
+            {date:"2026-04-08",dayName:"Wednesday",defaultFinish:"16:10",workStart:"07:52",lunchStart:"14:33",lunchEnd:"15:15",endTime:"16:15",hoursWorked:27660,hoursLeft:300},
+            {date:"2026-04-09",dayName:"Thursday",defaultFinish:"16:36",workStart:"08:00",lunchStart:"15:00",lunchEnd:"16:00",endTime:"16:30",hoursWorked:27000,hoursLeft:-360},
+            {date:"2026-04-10",dayName:"Friday",defaultFinish:"16:33",workStart:"07:59",lunchStart:"14:34",lunchEnd:"15:32",endTime:"16:29",hoursWorked:27120,hoursLeft:-840},
+            {date:"2026-04-13",dayName:"Monday",defaultFinish:"16:31",workStart:"07:55",lunchStart:"14:00",lunchEnd:"15:00",endTime:"16:31",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-04-14",dayName:"Tuesday",defaultFinish:"16:24",workStart:"07:50",lunchStart:"14:07",lunchEnd:"15:05",endTime:"16:39",hoursWorked:28260,hoursLeft:900},
+            {date:"2026-04-15",dayName:"Wednesday",defaultFinish:"16:33",workStart:"07:57",lunchStart:"14:00",lunchEnd:"15:00",endTime:"16:20",hoursWorked:26580,hoursLeft:-780},
+            {date:"2026-04-16",dayName:"Thursday",defaultFinish:"16:30",workStart:"07:55",lunchStart:"14:02",lunchEnd:"15:01",endTime:"17:03",hoursWorked:29340,hoursLeft:1980},
+            {date:"2026-04-17",dayName:"Friday",defaultFinish:"17:03",workStart:"07:57",lunchStart:"13:15",lunchEnd:"14:45",endTime:"16:32",hoursWorked:25500,hoursLeft:-240},
+            {date:"2026-04-20",dayName:"Monday",defaultFinish:"16:25",workStart:"07:50",lunchStart:"12:50",lunchEnd:"13:49",endTime:"16:30",hoursWorked:27660,hoursLeft:300},
+            {date:"2026-04-21",dayName:"Tuesday",defaultFinish:"16:26",workStart:"07:53",lunchStart:"14:08",lunchEnd:"15:05",endTime:"16:30",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-04-22",dayName:"Wednesday",defaultFinish:"16:25",workStart:"07:56",lunchStart:"14:12",lunchEnd:"15:05",endTime:"16:27",hoursWorked:27480,hoursLeft:120},
+            {date:"2026-04-23",dayName:"Thursday",defaultFinish:"16:20",workStart:"07:54",lunchStart:"15:05",lunchEnd:"15:55",endTime:"16:15",hoursWorked:27060,hoursLeft:-300},
+            {date:"2026-04-24",dayName:"Friday",defaultFinish:"16:33",workStart:"07:57",lunchStart:"14:01",lunchEnd:"15:01",endTime:"16:31",hoursWorked:27240,hoursLeft:-240},
+            {date:"2026-04-27",dayName:"Monday",defaultFinish:"16:25",workStart:"07:51",lunchStart:"14:00",lunchEnd:"14:58",endTime:"16:30",hoursWorked:27660,hoursLeft:300},
+            {date:"2026-04-28",dayName:"Tuesday",defaultFinish:"16:27",workStart:"07:53",lunchStart:"13:45",lunchEnd:"14:43",endTime:"16:30",hoursWorked:27540,hoursLeft:180},
+            {date:"2026-04-29",dayName:"Wednesday",defaultFinish:"16:26",workStart:"07:52",lunchStart:"14:53",lunchEnd:"15:51",endTime:"16:29",hoursWorked:27540,hoursLeft:180},
+            {date:"2026-04-30",dayName:"Thursday",defaultFinish:"16:17",workStart:"07:52",lunchStart:"14:27",lunchEnd:"15:16",endTime:"16:19",hoursWorked:27480,hoursLeft:120},
+            {date:"2026-05-01",dayName:"Friday",defaultFinish:"16:46",workStart:"07:50",lunchStart:"14:20",lunchEnd:"15:40",endTime:"16:35",hoursWorked:26700,hoursLeft:-120},
+            {date:"2026-05-04",dayName:"Monday",defaultFinish:"16:29",workStart:"07:54",lunchStart:"14:36",lunchEnd:"15:35",endTime:"16:50",hoursWorked:28620,hoursLeft:1260},
+            {date:"2026-05-05",dayName:"Tuesday",defaultFinish:"16:36",workStart:"08:00",lunchStart:"14:30",lunchEnd:"15:30",endTime:"16:42",hoursWorked:27720,hoursLeft:360},
+            {date:"2026-05-06",dayName:"Wednesday",defaultFinish:"16:36",workStart:"07:59",lunchStart:"13:58",lunchEnd:"14:59",endTime:"17:09",hoursWorked:29340,hoursLeft:1980},
+            {date:"2026-05-07",dayName:"Thursday",defaultFinish:"16:35",workStart:"07:56",lunchStart:"13:13",lunchEnd:"14:16",endTime:"16:23",hoursWorked:26640,hoursLeft:-720},
+            {date:"2026-05-08",dayName:"Friday",defaultFinish:"16:37",workStart:"08:01",lunchStart:"14:03",lunchEnd:"15:03",endTime:"16:20",hoursWorked:26340,hoursLeft:-1860},
+            {date:"2026-05-11",dayName:"Monday",defaultFinish:"16:30",workStart:"07:54",lunchStart:"14:30",lunchEnd:"15:30",endTime:"16:30",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-05-12",dayName:"Tuesday",defaultFinish:"16:30",workStart:"07:54",lunchStart:"14:10",lunchEnd:"15:10",endTime:"16:30",hoursWorked:27360,hoursLeft:0},
+            {date:"2026-05-13",dayName:"Wednesday",defaultFinish:"16:28",workStart:"07:52",lunchStart:"15:00",lunchEnd:"16:00",endTime:"16:29",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-05-14",dayName:"Thursday",defaultFinish:"16:19",workStart:"07:53",lunchStart:"14:52",lunchEnd:"15:42",endTime:"16:15",hoursWorked:27120,hoursLeft:-240},
+            {date:"2026-05-15",dayName:"Friday",defaultFinish:"16:16",workStart:"07:50",lunchStart:"14:25",lunchEnd:"15:15",endTime:"16:21",hoursWorked:27660,hoursLeft:-120},
+            {date:"2026-05-18",dayName:"Monday",defaultFinish:"16:31",workStart:"07:55",lunchStart:"14:34",lunchEnd:"15:34",endTime:"16:35",hoursWorked:27600,hoursLeft:240},
+            {date:"2026-05-19",dayName:"Tuesday",defaultFinish:"16:27",workStart:"07:54",lunchStart:"14:24",lunchEnd:"15:21",endTime:"16:28",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-05-20",dayName:"Wednesday",defaultFinish:"15:48",workStart:"07:54",lunchStart:"14:29",lunchEnd:"14:47",endTime:"15:50",hoursWorked:27480,hoursLeft:120},
+            {date:"2026-05-21",dayName:"Thursday",defaultFinish:"16:29",workStart:"07:54",lunchStart:"14:18",lunchEnd:"15:17",endTime:"16:30",hoursWorked:27420,hoursLeft:60},
+            {date:"2026-05-22",dayName:"Friday",defaultFinish:"",workStart:"",lunchStart:"",lunchEnd:"",endTime:"",hoursWorked:26880,hoursLeft:0}
+        ];
+
+        const WEEKLY_TARGET_MINUTES = 2280; // 38 hours
+        const DAILY_TARGET_SECONDS = 27360; // 7h 36m
+
+        const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+        let scheduleData = [];
+        let weeks = {};
+        let weekKeys = [];
+        let currentWeekIndex = 0;
+
+        function loadData() {
+            const saved = localStorage.getItem('workHoursData');
+            if (saved) {
+                try {
+                    scheduleData = JSON.parse(saved);
+                } catch(e) {
+                    scheduleData = [...DEFAULT_DATA];
+                }
+            } else {
+                scheduleData = [...DEFAULT_DATA];
+            }
+        }
+
+        function saveData() {
+            scheduleData.forEach((day, idx) => {
+                const card = document.querySelector(`[data-idx="${idx}"]`);
+                if (card) {
+                    const inputs = card.querySelectorAll('.time-input');
+                    if (inputs.length >= 5) {
+                        day.workStart = inputs[0].value;
+                        day.lunchStart = inputs[1].value;
+                        day.lunchEnd = inputs[2].value;
+                        day.endTime = inputs[3].value;
+                        day.defaultFinish = inputs[4].value;
+                    }
+                    recalculateDay(day);
+                }
+            });
+
+            localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+            showToast('Saved!');
+            render();
+        }
+
+        function resetData() {
+            if (confirm('Reset all data to original values?')) {
+                localStorage.removeItem('workHoursData');
+                scheduleData = [...DEFAULT_DATA];
+                buildWeeks();
+                findCurrentWeek();
+                render();
+                showToast('Reset to original');
+            }
+        }
+
+        function addWeek() {
+            // Find the last date in the data
+            const lastDay = scheduleData[scheduleData.length - 1];
+            const lastDate = new Date(lastDay.date + 'T00:00:00');
+
+            // Calculate next Monday
+            const nextMonday = new Date(lastDate);
+            const daysUntilMonday = (8 - nextMonday.getDay()) % 7 || 7;
+            // If last day is already a Friday, next Monday is +3 days
+            // If last day is a Monday, next Monday is +7 days
+            const dayOfWeek = nextMonday.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri
+            const daysToAdd = dayOfWeek === 5 ? 3 : (8 - dayOfWeek) % 7 || 7;
+            nextMonday.setDate(nextMonday.getDate() + daysToAdd);
+
+            // Create 5 days (Mon-Fri)
+            const newDays = [];
+            for (let i = 0; i < 5; i++) {
+                const d = new Date(nextMonday);
+                d.setDate(d.getDate() + i);
+                const dateStr = d.toISOString().split('T')[0];
+                newDays.push({
+                    date: dateStr,
+                    dayName: DAY_NAMES[i],
+                    defaultFinish: "",
+                    workStart: "",
+                    lunchStart: "",
+                    lunchEnd: "",
+                    endTime: "",
+                    hoursWorked: 0,
+                    hoursLeft: 0
+                });
+            }
+
+            scheduleData.push(...newDays);
+            buildWeeks();
+            currentWeekIndex = weekKeys.length - 1; // Navigate to new week
+            saveData();
+            showToast('New week added');
+        }
+
+        function recalculateDay(day) {
+            if (day.workStart && day.endTime && day.lunchStart && day.lunchEnd) {
+                const start = timeToMinutes(day.workStart);
+                const end = timeToMinutes(day.endTime);
+                const lunchS = timeToMinutes(day.lunchStart);
+                const lunchE = timeToMinutes(day.lunchEnd);
+
+                if (start !== null && end !== null && lunchS !== null && lunchE !== null) {
+                    const totalMinutes = end - start - (lunchE - lunchS);
+                    day.hoursWorked = totalMinutes * 60;
+                }
+            }
+        }
+
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return null;
+            const parts = timeStr.split(':');
+            if (parts.length >= 2) {
+                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            }
+            return null;
+        }
+
+        function formatHours(seconds) {
+            if (!seconds && seconds !== 0) return '--';
+            const totalMins = Math.abs(seconds) / 60;
+            const h = Math.floor(totalMins / 60);
+            const m = Math.round(totalMins % 60);
+            const sign = seconds < 0 ? '-' : '';
+            if (m === 0) return `${sign}${h}h`;
+            return `${sign}${h}h ${m}m`;
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+        }
+
+        function isToday(dateStr) {
+            const today = new Date();
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toDateString() === today.toDateString();
+        }
+
+        function getWeekStart(day) {
+            const d = new Date(day.date + 'T00:00:00');
+            const dayOfWeek = d.getDay();
+            const monday = new Date(d);
+            monday.setDate(d.getDate() - ((dayOfWeek + 6) % 7));
+            return monday.toISOString().split('T')[0];
+        }
+
+        function buildWeeks() {
+            weeks = {};
+            scheduleData.forEach(day => {
+                const weekStart = getWeekStart(day);
+                if (!weeks[weekStart]) weeks[weekStart] = [];
+                weeks[weekStart].push(day);
+            });
+            weekKeys = Object.keys(weeks).sort();
+        }
+
+        function findCurrentWeek() {
+            const today = new Date();
+            currentWeekIndex = 0;
+
+            for (let i = 0; i < weekKeys.length; i++) {
+                const weekEnd = new Date(weekKeys[i] + 'T00:00:00');
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                if (today >= new Date(weekKeys[i] + 'T00:00:00') && today <= weekEnd) {
+                    currentWeekIndex = i;
+                    return;
+                }
+            }
+
+            if (weekKeys.length > 0) {
+                currentWeekIndex = weekKeys.length - 1;
+            }
+        }
+
+        function navigateWeek(direction) {
+            const newIndex = currentWeekIndex + direction;
+            if (newIndex >= 0 && newIndex < weekKeys.length) {
+                currentWeekIndex = newIndex;
+                render();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function render() {
+            const container = document.getElementById('scheduleContainer');
+            const today = new Date();
+
+            // Update header
+            const firstDate = scheduleData[0]?.date || '';
+            const lastDate = scheduleData[scheduleData.length - 1]?.date || '';
+            const firstMonth = firstDate ? new Date(firstDate + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short' }) : '';
+            const lastMonth = lastDate ? new Date(lastDate + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short' }) : '';
+            const year = firstDate ? new Date(firstDate + 'T00:00:00').getFullYear() : '';
+            document.getElementById('headerSubtitle').textContent =
+                `${scheduleData.length} days · ${firstMonth} – ${lastMonth} ${year}`;
+
+            // Calculate totals
+            let totalSeconds = 0;
+            let dayCount = 0;
+            scheduleData.forEach(day => {
+                if (day.hoursWorked) {
+                    totalSeconds += day.hoursWorked;
+                    dayCount++;
+                }
+            });
+
+            document.getElementById('totalHours').textContent = formatHours(totalSeconds);
+
+            // Avg/day with dynamic color
+            const avgEl = document.getElementById('avgHours');
+            if (dayCount > 0) {
+                const avgSeconds = totalSeconds / dayCount;
+                avgEl.textContent = formatHours(avgSeconds);
+                avgEl.className = 'value ' + (avgSeconds >= DAILY_TARGET_SECONDS ? 'green' : 'red');
+            } else {
+                avgEl.textContent = '--';
+                avgEl.className = 'value';
+            }
+
+            // Current week data
+            const currentWeekStart = weekKeys[currentWeekIndex];
+            const currentDays = weeks[currentWeekStart] || [];
+
+            // Week nav label
+            if (currentDays.length > 0) {
+                const startDate = currentDays[0].date;
+                const endDate = currentDays[currentDays.length - 1].date;
+                const startD = new Date(startDate + 'T00:00:00');
+                const endD = new Date(endDate + 'T00:00:00');
+                const startStr = startD.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+                const endStr = endD.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+                const yearStr = startD.getFullYear();
+                document.getElementById('weekNavDates').textContent = `${startStr} – ${endStr}`;
+                document.getElementById('weekNavYear').textContent = yearStr;
+            }
+
+            // Nav buttons
+            document.getElementById('prevWeekBtn').disabled = currentWeekIndex === 0;
+            document.getElementById('nextWeekBtn').disabled = currentWeekIndex >= weekKeys.length - 1;
+
+            // Week summary
+            let weekSeconds = 0;
+            let weekBalance = 0;
+            currentDays.forEach(day => {
+                if (day.hoursWorked) weekSeconds += day.hoursWorked;
+                if (day.hoursLeft !== undefined) weekBalance += day.hoursLeft;
+            });
+
+            document.getElementById('weekHours').textContent = formatHours(weekSeconds);
+            const balEl = document.getElementById('weekBalance');
+            balEl.textContent = formatHours(weekBalance * 60);
+            balEl.className = 'value ' + (weekBalance >= 0 ? 'green' : 'red');
+
+            // Week progress bar
+            const weekMins = weekSeconds / 60;
+            const pct = Math.min(100, (weekMins / WEEKLY_TARGET_MINUTES) * 100);
+            document.getElementById('weekBarFill').style.width = pct + '%';
+
+            // Render only current week
+            let html = '';
+            const days = currentDays;
+
+            days.forEach((day) => {
+                const globalIdx = scheduleData.indexOf(day);
+                const todayClass = isToday(day.date) ? 'today' : '';
+                const isEmpty = !day.workStart && !day.endTime;
+                const emptyClass = isEmpty ? 'empty-day' : '';
+                const hoursClass = day.hoursLeft > 0 ? 'positive' :
+                                   day.hoursLeft < 0 ? 'negative' : 'neutral';
+
+                let statusBadge = '';
+                if (isEmpty) {
+                    statusBadge = '<div class="status-badge empty">Not started</div>';
+                } else if (day.hoursLeft > 60) {
+                    statusBadge = '<div class="status-badge ahead">Ahead</div>';
+                } else if (day.hoursLeft < -60) {
+                    statusBadge = '<div class="status-badge behind">Behind</div>';
+                } else if (day.hoursWorked) {
+                    statusBadge = '<div class="status-badge on-track">On Track</div>';
+                }
+
+                const emptyClass_input = isEmpty ? ' empty' : '';
+
+                html += `
+                <div class="day-card ${todayClass} ${emptyClass}" data-idx="${globalIdx}" onclick="toggleCard(this)">
+                    <div class="day-main">
+                        <div class="day-info">
+                            <div class="day-name">${day.dayName}${isToday(day.date) ? ' · Today' : ''}</div>
+                            <div class="day-date">${formatDate(day.date)}</div>
+                            ${statusBadge}
+                        </div>
+                        <div class="day-hours">
+                            <div class="hours-value ${hoursClass}">${isEmpty ? '--' : formatHours(day.hoursWorked)}</div>
+                            <div class="hours-label">${isEmpty ? '' : (day.hoursLeft >= 0 ? '+' : '') + day.hoursLeft + 'min left'}</div>
+                        </div>
+                        <svg class="chevron" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+                        </svg>
+                    </div>
+                    <div class="day-details">
+                        <div class="details-inner">
+                            <div class="time-row">
+                                <div class="time-label"><span class="icon">&#x1F6AA;</span> Start</div>
+                                <input type="time" class="time-input${emptyClass_input}" value="${day.workStart}" onchange="onTimeChange(this, ${globalIdx})">
+                            </div>
+                            <div class="time-row">
+                                <div class="time-label"><span class="icon">&#x1F37D;</span> Lunch Start</div>
+                                <input type="time" class="time-input${emptyClass_input}" value="${day.lunchStart}" onchange="onTimeChange(this, ${globalIdx})">
+                            </div>
+                            <div class="time-row">
+                                <div class="time-label"><span class="icon">&#x2615;</span> Lunch End</div>
+                                <input type="time" class="time-input${emptyClass_input}" value="${day.lunchEnd}" onchange="onTimeChange(this, ${globalIdx})">
+                            </div>
+                            <div class="time-row">
+                                <div class="time-label"><span class="icon">&#x1F3E0;</span> End</div>
+                                <input type="time" class="time-input${emptyClass_input}" value="${day.endTime}" onchange="onTimeChange(this, ${globalIdx})">
+                            </div>
+                            <div class="time-row">
+                                <div class="time-label"><span class="icon">&#x1F4CB;</span> Target</div>
+                                <input type="time" class="time-input${emptyClass_input}" value="${day.defaultFinish}" onchange="onTimeChange(this, ${globalIdx})">
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function toggleCard(card) {
+            if (event.target.tagName === 'INPUT') return;
+            card.classList.toggle('expanded');
+        }
+
+        function onTimeChange(input, idx) {
+            const day = scheduleData[idx];
+            const card = input.closest('.day-card');
+            const inputs = card.querySelectorAll('.time-input');
+
+            day.workStart = inputs[0].value;
+            day.lunchStart = inputs[1].value;
+            day.lunchEnd = inputs[2].value;
+            day.endTime = inputs[3].value;
+            day.defaultFinish = inputs[4].value;
+
+            recalculateDay(day);
+
+            const hoursValue = card.querySelector('.hours-value');
+            hoursValue.textContent = formatHours(day.hoursWorked);
+
+            // Update empty styling
+            const isEmpty = !day.workStart && !day.endTime;
+            card.classList.toggle('empty-day', isEmpty);
+            inputs.forEach(inp => inp.classList.toggle('empty', isEmpty));
+
+            localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Init
+        loadData();
+        buildWeeks();
+        findCurrentWeek();
+        render();
+    </script>
+</body>
+</html>
