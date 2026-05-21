@@ -1092,12 +1092,12 @@
     "date": "2026-05-22",
     "dayName": "Friday",
     "workStart": "07:54",
-    "lunchStart": "",
-    "lunchEnd": "",
+    "lunchStart": "14:30",
+    "lunchEnd": "15:03",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "16:03"
   },
   {
     "date": "2026-05-25",
