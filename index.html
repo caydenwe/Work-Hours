@@ -647,28 +647,15 @@
     <div class="modal-overlay" id="settingsOverlay" onclick="closeSettings(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-handle"></div>
-            <h2>GitHub Sync</h2>
-            <div class="modal-field">
-                <label>Owner</label>
-                <input type="text" id="ghOwner" placeholder="your-username">
-            </div>
-            <div class="modal-field">
-                <label>Repo</label>
-                <input type="text" id="ghRepo" placeholder="Work-Hours">
-            </div>
-            <div class="modal-field">
-                <label>Branch</label>
-                <input type="text" id="ghBranch" placeholder="main">
-                <div class="hint">The branch where data.json lives</div>
-            </div>
+            <h2>Cloud Sync</h2>
             <div class="modal-field">
                 <label>Personal Access Token</label>
-                <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+                <input type="password" id="ghToken" placeholder="github_pat_xxxxxxxxxxxx">
                 <div class="hint">Fine-grained token with Contents read/write for this repo only</div>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn secondary" onclick="closeSettings()">Cancel</button>
-                <button class="modal-btn danger" onclick="clearToken()">Clear Token</button>
+                <button class="modal-btn danger" onclick="clearToken()">Clear</button>
                 <button class="modal-btn primary" onclick="saveSettings()">Save</button>
             </div>
         </div>
@@ -789,102 +776,160 @@
         let weeks = {};
         let weekKeys = [];
         let currentWeekIndex = 0;
-        let githubSha = null; // SHA for conditional updates
 
-        // GitHub config
-        const GH_DATA_FILE = 'data.json';
-        function getGhConfig() {
-            return {
-                owner: localStorage.getItem('ghOwner') || '',
-                repo: localStorage.getItem('ghRepo') || '',
-                branch: localStorage.getItem('ghBranch') || 'main',
-                token: localStorage.getItem('ghToken') || ''
-            };
+        // ── GitHub Sync ──────────────────────────────────────────
+        const REPO_OWNER = 'caydenwe';
+        const REPO_NAME = 'Work-Hours';
+        const DATA_PATH = 'data.json';
+        const API_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${DATA_PATH}`;
+        const COMMITS_URL = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/commits?path=${DATA_PATH}&per_page=1`;
+
+        let lastCloudCommit = null;
+        let syncTimeout = null;
+
+        function getPat() {
+            return localStorage.getItem('wh_pat') || '';
         }
 
         function setSyncState(state, label) {
             const dot = document.getElementById('syncDot');
             const lbl = document.getElementById('syncLabel');
+            if (!dot || !lbl) return;
             dot.className = 'sync-dot ' + state;
             lbl.textContent = label;
         }
 
-        async function githubFetch(method, path, body) {
-            const cfg = getGhConfig();
-            if (!cfg.token) throw new Error('No token configured');
-            const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}${path}`;
-            const opts = {
-                method,
-                headers: {
-                    'Authorization': `Bearer ${cfg.token}`,
-                    'Accept': 'application/vnd.github+json',
-                    'X-GitHub-Api-Version': '2022-11-28'
-                }
-            };
-            if (body) {
-                opts.headers['Content-Type'] = 'application/json';
-                opts.body = JSON.stringify(body);
-            }
-            const res = await fetch(url, opts);
-            if (!res.ok) {
-                const err = await res.text();
-                throw new Error(`GitHub API ${res.status}: ${err}`);
-            }
-            return res.json();
-        }
+        async function loadCloud() {
+            const pat = getPat();
+            if (!pat) return false;
 
-        async function fetchFromGitHub() {
             setSyncState('syncing', 'Syncing...');
             try {
-                const data = await githubFetch('GET', `/contents/${GH_DATA_FILE}?ref=${getGhConfig().branch}`);
-                githubSha = data.sha;
-                const json = atob(data.content);
-                scheduleData = JSON.parse(json);
+                const headers = {
+                    'Authorization': `Bearer ${pat}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                };
+
+                const res = await fetch(API_URL, { headers });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const file = await res.json();
+
+                // Safari-safe base64 decode
+                const b64 = file.content.replace(/\s/g, '');
+                scheduleData = JSON.parse(atob(b64));
+
+                // Track commit SHA
+                const commitRes = await fetch(COMMITS_URL, { headers });
+                if (commitRes.ok) {
+                    const commits = await commitRes.json();
+                    if (commits.length > 0) lastCloudCommit = commits[0].sha;
+                }
+
                 setSyncState('connected', 'Synced');
                 return true;
             } catch(e) {
                 if (e.message.includes('404')) {
-                    // File doesn't exist yet — that's OK, we'll create it on first save
                     setSyncState('connected', 'Ready');
                     return false;
                 }
                 setSyncState('error', 'Error');
-                console.warn('GitHub fetch failed:', e);
+                console.warn('loadCloud failed:', e);
                 return false;
             }
         }
 
-        async function pushToGitHub() {
-            const cfg = getGhConfig();
-            if (!cfg.token) return false;
+        async function saveCloud() {
+            const pat = getPat();
+            if (!pat) return false;
+
             setSyncState('syncing', 'Saving...');
             try {
-                const content = btoa(JSON.stringify(scheduleData, null, 2));
-                const body = {
-                    message: `Update work hours data — ${new Date().toISOString()}`,
-                    content,
-                    branch: cfg.branch
-                };
-                if (githubSha) body.sha = githubSha;
-                await githubFetch('PUT', `/contents/${GH_DATA_FILE}`, body);
-                // Re-fetch to get the new SHA
-                const data = await githubFetch('GET', `/contents/${GH_DATA_FILE}?ref=${cfg.branch}`);
-                githubSha = data.sha;
+                // Get current file SHA (required for updates)
+                const getRes = await fetch(API_URL, {
+                    headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                const getFile = await getRes.json();
+                const sha = getFile.sha;
+
+                // Safari-safe base64 encode
+                const content = btoa(unescape(encodeURIComponent(JSON.stringify(scheduleData, null, 2))));
+
+                const putRes = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${pat}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Update work hours — ${new Date().toISOString()}`,
+                        content,
+                        sha,
+                        branch: 'main'
+                    })
+                });
+
+                if (!putRes.ok) throw new Error(`Save failed: ${putRes.status}`);
+
+                // Update commit tracking
+                const commitRes = await fetch(COMMITS_URL, {
+                    headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (commitRes.ok) {
+                    const commits = await commitRes.json();
+                    if (commits.length > 0) lastCloudCommit = commits[0].sha;
+                }
+
                 setSyncState('connected', 'Synced');
                 return true;
             } catch(e) {
                 setSyncState('error', 'Save failed');
-                console.warn('GitHub push failed:', e);
+                console.warn('saveCloud failed:', e);
                 return false;
             }
         }
 
+        function scheduleSave() {
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(() => {
+                // Save locally first
+                localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+                // Then push to cloud
+                saveCloud();
+            }, 2000);
+        }
+
+        // Background sync poller — checks every 30s for remote changes
+        setInterval(async () => {
+            const pat = getPat();
+            if (!pat) return;
+
+            try {
+                const res = await fetch(COMMITS_URL, {
+                    headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github.v3+json' }
+                });
+                if (res.ok) {
+                    const commits = await res.json();
+                    if (commits.length > 0 && commits[0].sha !== lastCloudCommit) {
+                        console.log('Remote change detected, syncing...');
+                        const ok = await loadCloud();
+                        if (ok) {
+                            buildWeeks();
+                            findCurrentWeek();
+                            render();
+                            localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+                            showToast('Synced from cloud');
+                        }
+                    }
+                }
+            } catch(e) {
+                // Silently ignore poller errors
+            }
+        }, 30000);
+
+        // ── Settings Modal ───────────────────────────────────────
         function openSettings() {
-            const cfg = getGhConfig();
-            document.getElementById('ghOwner').value = cfg.owner;
-            document.getElementById('ghRepo').value = cfg.repo;
-            document.getElementById('ghBranch').value = cfg.branch;
-            document.getElementById('ghToken').value = cfg.token;
+            document.getElementById('ghToken').value = getPat();
             document.getElementById('settingsOverlay').classList.add('show');
         }
 
@@ -894,61 +939,41 @@
         }
 
         function saveSettings() {
-            const owner = document.getElementById('ghOwner').value.trim();
-            const repo = document.getElementById('ghRepo').value.trim();
-            const branch = document.getElementById('ghBranch').value.trim() || 'main';
             const token = document.getElementById('ghToken').value.trim();
-
-            localStorage.setItem('ghOwner', owner);
-            localStorage.setItem('ghRepo', repo);
-            localStorage.setItem('ghBranch', branch);
-            if (token) localStorage.setItem('ghToken', token);
-
+            if (token) {
+                localStorage.setItem('wh_pat', token);
+            }
             closeSettings();
 
-            // Try to sync immediately
-            if (owner && repo && token) {
-                syncFromGitHub();
+            if (token) {
+                loadCloud().then(ok => {
+                    if (ok) {
+                        buildWeeks();
+                        findCurrentWeek();
+                        render();
+                        localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+                        showToast('Synced from cloud');
+                    }
+                });
             }
         }
 
         function clearToken() {
-            localStorage.removeItem('ghToken');
+            localStorage.removeItem('wh_pat');
             document.getElementById('ghToken').value = '';
-            githubSha = null;
+            lastCloudCommit = null;
             setSyncState('', 'Offline');
             showToast('Token cleared');
         }
 
-        async function syncFromGitHub() {
-            const cfg = getGhConfig();
-            if (!cfg.owner || !cfg.repo || !cfg.token) {
-                setSyncState('', 'Offline');
-                return;
-            }
-            const ok = await fetchFromGitHub();
-            if (ok) {
-                buildWeeks();
-                findCurrentWeek();
-                render();
-                localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
-                showToast('Synced from GitHub');
-            }
-        }
-
         async function loadData() {
-            const cfg = getGhConfig();
-            const hasGhConfig = cfg.owner && cfg.repo && cfg.token;
-
-            if (hasGhConfig) {
-                // Try GitHub first
-                const ok = await fetchFromGitHub();
+            const pat = getPat();
+            if (pat) {
+                const ok = await loadCloud();
                 if (ok) {
-                    // Got data from GitHub, save locally too
                     localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
                     return;
                 }
-                // GitHub failed or no file yet — fall through to localStorage
             }
 
             // Fallback: localStorage or defaults
@@ -961,7 +986,7 @@
         }
 
         async function saveData() {
-            // First gather data from the DOM
+            // Gather data from DOM
             scheduleData.forEach((day, idx) => {
                 const card = document.querySelector(`[data-idx="${idx}"]`);
                 if (card) {
@@ -976,13 +1001,13 @@
                 }
             });
 
-            // Always save locally
+            // Save locally
             localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
 
-            // Try to push to GitHub
-            const cfg = getGhConfig();
-            if (cfg.owner && cfg.repo && cfg.token) {
-                const ok = await pushToGitHub();
+            // Push to cloud
+            const pat = getPat();
+            if (pat) {
+                const ok = await saveCloud();
                 if (ok) {
                     showToast('Saved & synced');
                 } else {
@@ -1335,7 +1360,9 @@
             card.classList.toggle('empty-day', isEmpty);
             inputs.forEach(inp => inp.classList.toggle('empty', isEmpty));
 
+            // Save locally immediately, debounce cloud push
             localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+            scheduleSave();
         }
 
         function showToast(msg) {
@@ -1355,9 +1382,7 @@
             render();
             localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
 
-            // Check if GitHub is configured
-            const cfg = getGhConfig();
-            if (cfg.owner && cfg.repo && cfg.token) {
+            if (getPat()) {
                 setSyncState('connected', 'Ready');
             }
         })();
