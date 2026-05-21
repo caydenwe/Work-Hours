@@ -49,18 +49,15 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .header h1 {
             font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.5px;
-        }
-
-        .header-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 2px;
         }
 
         /* Week Navigation */
@@ -371,10 +368,6 @@
             color: var(--accent);
         }
 
-        .fab.add-week {
-            background: var(--green);
-        }
-
         /* Toast */
         .toast {
             position: fixed;
@@ -396,6 +389,148 @@
         .toast.show {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
+        }
+
+        /* Sync status */
+        .sync-status {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top, 12px));
+            right: 16px;
+            z-index: 150;
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .sync-dot.connected { background: var(--green); }
+        .sync-dot.error { background: var(--red); }
+        .sync-dot.syncing { background: var(--orange); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 400;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 16px 16px 0 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 auto 16px;
+        }
+
+        .modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal-field {
+            margin-bottom: 14px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            -webkit-appearance: none;
+        }
+
+        .modal-field input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .modal-field .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .modal-btn.primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .modal-btn:active {
+            opacity: 0.8;
+        }
+
+        .modal-btn.danger {
+            background: var(--red-light);
+            color: var(--red);
         }
 
         /* Scrollbar */
@@ -448,8 +583,11 @@
 </head>
 <body>
     <div class="header">
-        <h1>Work Hours</h1>
-        <div class="header-subtitle" id="headerSubtitle">Loading...</div>
+        <h1 id="headerTitle">Work Hours 2026</h1>
+        <div class="sync-status" id="syncStatus">
+            <div class="sync-dot" id="syncDot"></div>
+            <span id="syncLabel">Offline</span>
+        </div>
     </div>
 
     <!-- Week Navigation -->
@@ -494,15 +632,46 @@
     <div id="scheduleContainer"></div>
 
     <div class="fab-container">
-        <button class="fab secondary" onclick="resetData()">
-            <span>&#x21bb;</span> Reset
+        <button class="fab secondary" onclick="goToday()">
+            <span>&#x1F4C5;</span> Today
         </button>
-        <button class="fab add-week" onclick="addWeek()">
-            <span>+</span> Add Week
+        <button class="fab secondary" onclick="openSettings()">
+            <span>&#x2699;</span> Sync
         </button>
         <button class="fab" onclick="saveData()">
             <span>&#x2713;</span> Save
         </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <h2>GitHub Sync</h2>
+            <div class="modal-field">
+                <label>Owner</label>
+                <input type="text" id="ghOwner" placeholder="your-username">
+            </div>
+            <div class="modal-field">
+                <label>Repo</label>
+                <input type="text" id="ghRepo" placeholder="Work-Hours">
+            </div>
+            <div class="modal-field">
+                <label>Branch</label>
+                <input type="text" id="ghBranch" placeholder="main">
+                <div class="hint">The branch where data.json lives</div>
+            </div>
+            <div class="modal-field">
+                <label>Personal Access Token</label>
+                <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+                <div class="hint">Fine-grained token with Contents read/write for this repo only</div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeSettings()">Cancel</button>
+                <button class="modal-btn danger" onclick="clearToken()">Clear Token</button>
+                <button class="modal-btn primary" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
     </div>
 
     <div class="toast" id="toast">Saved!</div>
@@ -620,90 +789,251 @@
         let weeks = {};
         let weekKeys = [];
         let currentWeekIndex = 0;
+        let githubSha = null; // SHA for conditional updates
 
-        function loadData() {
+        // GitHub config
+        const GH_DATA_FILE = 'data.json';
+        function getGhConfig() {
+            return {
+                owner: localStorage.getItem('ghOwner') || '',
+                repo: localStorage.getItem('ghRepo') || '',
+                branch: localStorage.getItem('ghBranch') || 'main',
+                token: localStorage.getItem('ghToken') || ''
+            };
+        }
+
+        function setSyncState(state, label) {
+            const dot = document.getElementById('syncDot');
+            const lbl = document.getElementById('syncLabel');
+            dot.className = 'sync-dot ' + state;
+            lbl.textContent = label;
+        }
+
+        async function githubFetch(method, path, body) {
+            const cfg = getGhConfig();
+            if (!cfg.token) throw new Error('No token configured');
+            const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}${path}`;
+            const opts = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${cfg.token}`,
+                    'Accept': 'application/vnd.github+json',
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            };
+            if (body) {
+                opts.headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+            }
+            const res = await fetch(url, opts);
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`GitHub API ${res.status}: ${err}`);
+            }
+            return res.json();
+        }
+
+        async function fetchFromGitHub() {
+            setSyncState('syncing', 'Syncing...');
+            try {
+                const data = await githubFetch('GET', `/contents/${GH_DATA_FILE}?ref=${getGhConfig().branch}`);
+                githubSha = data.sha;
+                const json = atob(data.content);
+                scheduleData = JSON.parse(json);
+                setSyncState('connected', 'Synced');
+                return true;
+            } catch(e) {
+                if (e.message.includes('404')) {
+                    // File doesn't exist yet — that's OK, we'll create it on first save
+                    setSyncState('connected', 'Ready');
+                    return false;
+                }
+                setSyncState('error', 'Error');
+                console.warn('GitHub fetch failed:', e);
+                return false;
+            }
+        }
+
+        async function pushToGitHub() {
+            const cfg = getGhConfig();
+            if (!cfg.token) return false;
+            setSyncState('syncing', 'Saving...');
+            try {
+                const content = btoa(JSON.stringify(scheduleData, null, 2));
+                const body = {
+                    message: `Update work hours data — ${new Date().toISOString()}`,
+                    content,
+                    branch: cfg.branch
+                };
+                if (githubSha) body.sha = githubSha;
+                await githubFetch('PUT', `/contents/${GH_DATA_FILE}`, body);
+                // Re-fetch to get the new SHA
+                const data = await githubFetch('GET', `/contents/${GH_DATA_FILE}?ref=${cfg.branch}`);
+                githubSha = data.sha;
+                setSyncState('connected', 'Synced');
+                return true;
+            } catch(e) {
+                setSyncState('error', 'Save failed');
+                console.warn('GitHub push failed:', e);
+                return false;
+            }
+        }
+
+        function openSettings() {
+            const cfg = getGhConfig();
+            document.getElementById('ghOwner').value = cfg.owner;
+            document.getElementById('ghRepo').value = cfg.repo;
+            document.getElementById('ghBranch').value = cfg.branch;
+            document.getElementById('ghToken').value = cfg.token;
+            document.getElementById('settingsOverlay').classList.add('show');
+        }
+
+        function closeSettings(e) {
+            if (e && e.target !== e.currentTarget) return;
+            document.getElementById('settingsOverlay').classList.remove('show');
+        }
+
+        function saveSettings() {
+            const owner = document.getElementById('ghOwner').value.trim();
+            const repo = document.getElementById('ghRepo').value.trim();
+            const branch = document.getElementById('ghBranch').value.trim() || 'main';
+            const token = document.getElementById('ghToken').value.trim();
+
+            localStorage.setItem('ghOwner', owner);
+            localStorage.setItem('ghRepo', repo);
+            localStorage.setItem('ghBranch', branch);
+            if (token) localStorage.setItem('ghToken', token);
+
+            closeSettings();
+
+            // Try to sync immediately
+            if (owner && repo && token) {
+                syncFromGitHub();
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('ghToken');
+            document.getElementById('ghToken').value = '';
+            githubSha = null;
+            setSyncState('', 'Offline');
+            showToast('Token cleared');
+        }
+
+        async function syncFromGitHub() {
+            const cfg = getGhConfig();
+            if (!cfg.owner || !cfg.repo || !cfg.token) {
+                setSyncState('', 'Offline');
+                return;
+            }
+            const ok = await fetchFromGitHub();
+            if (ok) {
+                buildWeeks();
+                findCurrentWeek();
+                render();
+                localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+                showToast('Synced from GitHub');
+            }
+        }
+
+        async function loadData() {
+            const cfg = getGhConfig();
+            const hasGhConfig = cfg.owner && cfg.repo && cfg.token;
+
+            if (hasGhConfig) {
+                // Try GitHub first
+                const ok = await fetchFromGitHub();
+                if (ok) {
+                    // Got data from GitHub, save locally too
+                    localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+                    return;
+                }
+                // GitHub failed or no file yet — fall through to localStorage
+            }
+
+            // Fallback: localStorage or defaults
             const saved = localStorage.getItem('workHoursData');
             if (saved) {
-                try {
-                    scheduleData = JSON.parse(saved);
-                } catch(e) {
-                    scheduleData = [...DEFAULT_DATA];
-                }
+                try { scheduleData = JSON.parse(saved); } catch(e) { scheduleData = [...DEFAULT_DATA]; }
             } else {
                 scheduleData = [...DEFAULT_DATA];
             }
         }
 
-        function saveData() {
+        async function saveData() {
+            // First gather data from the DOM
             scheduleData.forEach((day, idx) => {
                 const card = document.querySelector(`[data-idx="${idx}"]`);
                 if (card) {
                     const inputs = card.querySelectorAll('.time-input');
-                    if (inputs.length >= 5) {
+                    if (inputs.length >= 4) {
                         day.workStart = inputs[0].value;
                         day.lunchStart = inputs[1].value;
                         day.lunchEnd = inputs[2].value;
                         day.endTime = inputs[3].value;
-                        day.defaultFinish = inputs[4].value;
                     }
                     recalculateDay(day);
                 }
             });
 
+            // Always save locally
             localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
-            showToast('Saved!');
+
+            // Try to push to GitHub
+            const cfg = getGhConfig();
+            if (cfg.owner && cfg.repo && cfg.token) {
+                const ok = await pushToGitHub();
+                if (ok) {
+                    showToast('Saved & synced');
+                } else {
+                    showToast('Saved locally');
+                }
+            } else {
+                showToast('Saved!');
+            }
             render();
         }
 
-        function resetData() {
-            if (confirm('Reset all data to original values?')) {
-                localStorage.removeItem('workHoursData');
-                scheduleData = [...DEFAULT_DATA];
-                buildWeeks();
-                findCurrentWeek();
-                render();
-                showToast('Reset to original');
-            }
-        }
-
-        function addWeek() {
+        function generateRemainingWeeks() {
             // Find the last date in the data
             const lastDay = scheduleData[scheduleData.length - 1];
             const lastDate = new Date(lastDay.date + 'T00:00:00');
 
-            // Calculate next Monday
+            // End boundary: last Monday of 2026 (Dec 28)
+            const endDate = new Date(2026, 11, 28);
+
+            // Already generated through end of year?
+            if (lastDate >= endDate) return;
+
+            // Find next Monday after the last date
             const nextMonday = new Date(lastDate);
-            const daysUntilMonday = (8 - nextMonday.getDay()) % 7 || 7;
-            // If last day is already a Friday, next Monday is +3 days
-            // If last day is a Monday, next Monday is +7 days
-            const dayOfWeek = nextMonday.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri
+            const dayOfWeek = nextMonday.getDay();
             const daysToAdd = dayOfWeek === 5 ? 3 : (8 - dayOfWeek) % 7 || 7;
             nextMonday.setDate(nextMonday.getDate() + daysToAdd);
 
-            // Create 5 days (Mon-Fri)
             const newDays = [];
-            for (let i = 0; i < 5; i++) {
-                const d = new Date(nextMonday);
-                d.setDate(d.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
-                newDays.push({
-                    date: dateStr,
-                    dayName: DAY_NAMES[i],
-                    defaultFinish: "",
-                    workStart: "",
-                    lunchStart: "",
-                    lunchEnd: "",
-                    endTime: "",
-                    hoursWorked: 0,
-                    hoursLeft: 0
-                });
+            const current = new Date(nextMonday);
+            while (current <= endDate) {
+                for (let i = 0; i < 5; i++) {
+                    const d = new Date(current);
+                    d.setDate(d.getDate() + i);
+                    const dateStr = formatDateISO(d);
+                    newDays.push({
+                        date: dateStr,
+                        dayName: DAY_NAMES[i],
+                        workStart: "",
+                        lunchStart: "",
+                        lunchEnd: "",
+                        endTime: "",
+                        hoursWorked: 0,
+                        hoursLeft: 0,
+                        targetFinish: ""
+                    });
+                }
+                current.setDate(current.getDate() + 7);
             }
 
             scheduleData.push(...newDays);
-            buildWeeks();
-            currentWeekIndex = weekKeys.length - 1; // Navigate to new week
-            saveData();
-            showToast('New week added');
         }
 
         function recalculateDay(day) {
@@ -716,8 +1046,32 @@
                 if (start !== null && end !== null && lunchS !== null && lunchE !== null) {
                     const totalMinutes = end - start - (lunchE - lunchS);
                     day.hoursWorked = totalMinutes * 60;
+                    day.hoursLeft = day.hoursWorked - DAILY_TARGET_SECONDS;
                 }
+            } else {
+                day.hoursWorked = 0;
+                day.hoursLeft = 0;
             }
+
+            // Calculate target finish: start + 7h36m + lunch duration
+            if (day.workStart && day.lunchStart && day.lunchEnd) {
+                const start = timeToMinutes(day.workStart);
+                const lunchS = timeToMinutes(day.lunchStart);
+                const lunchE = timeToMinutes(day.lunchEnd);
+                if (start !== null && lunchS !== null && lunchE !== null) {
+                    const lunchDuration = lunchE - lunchS;
+                    const targetMinutes = start + DAILY_TARGET_SECONDS / 60 + lunchDuration;
+                    day.targetFinish = minutesToTimeStr(targetMinutes);
+                }
+            } else {
+                day.targetFinish = '';
+            }
+        }
+
+        function minutesToTimeStr(totalMinutes) {
+            const h = Math.floor(totalMinutes / 60) % 24;
+            const m = Math.round(totalMinutes % 60);
+            return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0');
         }
 
         function timeToMinutes(timeStr) {
@@ -739,6 +1093,13 @@
             return `${sign}${h}h ${m}m`;
         }
 
+        function formatMinutesLeft(seconds) {
+            const mins = Math.round(Math.abs(seconds) / 60);
+            if (seconds > 0) return `+${mins}m`;
+            if (seconds < 0) return `-${mins}m`;
+            return '0m';
+        }
+
         function formatDate(dateStr) {
             const d = new Date(dateStr + 'T00:00:00');
             return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
@@ -750,12 +1111,16 @@
             return d.toDateString() === today.toDateString();
         }
 
+        function formatDateISO(d) {
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
         function getWeekStart(day) {
             const d = new Date(day.date + 'T00:00:00');
             const dayOfWeek = d.getDay();
             const monday = new Date(d);
             monday.setDate(d.getDate() - ((dayOfWeek + 6) % 7));
-            return monday.toISOString().split('T')[0];
+            return formatDateISO(monday);
         }
 
         function buildWeeks() {
@@ -795,18 +1160,18 @@
             }
         }
 
+        function goToday() {
+            findCurrentWeek();
+            render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function render() {
             const container = document.getElementById('scheduleContainer');
             const today = new Date();
 
             // Update header
-            const firstDate = scheduleData[0]?.date || '';
-            const lastDate = scheduleData[scheduleData.length - 1]?.date || '';
-            const firstMonth = firstDate ? new Date(firstDate + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short' }) : '';
-            const lastMonth = lastDate ? new Date(lastDate + 'T00:00:00').toLocaleDateString('en-AU', { month: 'short' }) : '';
-            const year = firstDate ? new Date(firstDate + 'T00:00:00').getFullYear() : '';
-            document.getElementById('headerSubtitle').textContent =
-                `${scheduleData.length} days · ${firstMonth} – ${lastMonth} ${year}`;
+            document.getElementById('headerTitle').textContent = 'Work Hours 2026';
 
             // Calculate totals
             let totalSeconds = 0;
@@ -862,7 +1227,7 @@
 
             document.getElementById('weekHours').textContent = formatHours(weekSeconds);
             const balEl = document.getElementById('weekBalance');
-            balEl.textContent = formatHours(weekBalance * 60);
+            balEl.textContent = formatHours(weekBalance);
             balEl.className = 'value ' + (weekBalance >= 0 ? 'green' : 'red');
 
             // Week progress bar
@@ -905,7 +1270,7 @@
                         </div>
                         <div class="day-hours">
                             <div class="hours-value ${hoursClass}">${isEmpty ? '--' : formatHours(day.hoursWorked)}</div>
-                            <div class="hours-label">${isEmpty ? '' : (day.hoursLeft >= 0 ? '+' : '') + day.hoursLeft + 'min left'}</div>
+                            <div class="hours-label">${isEmpty ? '' : formatMinutesLeft(day.hoursLeft)}</div>
                         </div>
                         <svg class="chevron" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
@@ -930,8 +1295,8 @@
                                 <input type="time" class="time-input${emptyClass_input}" value="${day.endTime}" onchange="onTimeChange(this, ${globalIdx})">
                             </div>
                             <div class="time-row">
-                                <div class="time-label"><span class="icon">&#x1F4CB;</span> Target</div>
-                                <input type="time" class="time-input${emptyClass_input}" value="${day.defaultFinish}" onchange="onTimeChange(this, ${globalIdx})">
+                                <div class="time-label"><span class="icon">&#x1F3AF;</span> Target</div>
+                                <div style="font-size:17px;font-weight:600;color:var(--text-secondary);text-align:right;min-width:120px;">${day.targetFinish || '--:--'}</div>
                             </div>
                         </div>
                     </div>
@@ -955,12 +1320,15 @@
             day.lunchStart = inputs[1].value;
             day.lunchEnd = inputs[2].value;
             day.endTime = inputs[3].value;
-            day.defaultFinish = inputs[4].value;
 
             recalculateDay(day);
 
             const hoursValue = card.querySelector('.hours-value');
             hoursValue.textContent = formatHours(day.hoursWorked);
+
+            // Update target display
+            const targetEl = card.querySelector('.time-row:last-child div:last-child');
+            if (targetEl) targetEl.textContent = day.targetFinish || '--:--';
 
             // Update empty styling
             const isEmpty = !day.workStart && !day.endTime;
@@ -978,10 +1346,21 @@
         }
 
         // Init
-        loadData();
-        buildWeeks();
-        findCurrentWeek();
-        render();
+        (async function init() {
+            await loadData();
+            scheduleData.forEach(day => recalculateDay(day));
+            generateRemainingWeeks();
+            buildWeeks();
+            findCurrentWeek();
+            render();
+            localStorage.setItem('workHoursData', JSON.stringify(scheduleData));
+
+            // Check if GitHub is configured
+            const cfg = getGhConfig();
+            if (cfg.owner && cfg.repo && cfg.token) {
+                setSyncState('connected', 'Ready');
+            }
+        })();
     </script>
 </body>
 </html>
