@@ -1103,12 +1103,12 @@
     "date": "2026-05-25",
     "dayName": "Monday",
     "workStart": "07:54",
-    "lunchStart": "14:21",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchStart": "13:00",
+    "lunchEnd": "14:00",
+    "endTime": "11:21",
+    "hoursWorked": 8820,
+    "hoursLeft": -18540,
+    "targetFinish": "16:30"
   },
   {
     "date": "2026-05-26",
