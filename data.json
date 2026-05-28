@@ -1137,11 +1137,11 @@
     "dayName": "Thursday",
     "workStart": "07:53",
     "lunchStart": "14:20",
-    "lunchEnd": "15:30",
+    "lunchEnd": "15:20",
     "endTime": "16:30",
-    "hoursWorked": 26820,
-    "hoursLeft": -540,
-    "targetFinish": "16:39"
+    "hoursWorked": 27420,
+    "hoursLeft": 60,
+    "targetFinish": "16:29"
   },
   {
     "date": "2026-05-29",
