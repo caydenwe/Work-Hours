@@ -1158,12 +1158,12 @@
     "date": "2026-06-01",
     "dayName": "Monday",
     "workStart": "07:49",
-    "lunchStart": "14:30",
-    "lunchEnd": "03:50",
+    "lunchStart": "14:50",
+    "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": "04:45"
+    "targetFinish": ""
   },
   {
     "date": "2026-06-02",
