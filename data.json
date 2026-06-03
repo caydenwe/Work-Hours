@@ -1191,7 +1191,7 @@
     "date": "2026-06-04",
     "dayName": "Thursday",
     "workStart": "08:10",
-    "lunchStart": "",
+    "lunchStart": "08:10",
     "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
