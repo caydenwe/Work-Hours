@@ -1191,12 +1191,12 @@
     "date": "2026-06-04",
     "dayName": "Thursday",
     "workStart": "08:10",
-    "lunchStart": "14:30",
+    "lunchStart": "13:15",
     "lunchEnd": "15:20",
     "endTime": "16:20",
-    "hoursWorked": 26400,
-    "hoursLeft": -960,
-    "targetFinish": "16:36"
+    "hoursWorked": 21900,
+    "hoursLeft": -5460,
+    "targetFinish": "17:51"
   },
   {
     "date": "2026-06-05",
