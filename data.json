@@ -1224,12 +1224,12 @@
     "date": "2026-06-09",
     "dayName": "Tuesday",
     "workStart": "07:54",
-    "lunchStart": "14:30",
+    "lunchStart": "14:55",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 27360,
-    "hoursLeft": 0,
-    "targetFinish": "16:30"
+    "hoursWorked": 28860,
+    "hoursLeft": 1500,
+    "targetFinish": "16:05"
   },
   {
     "date": "2026-06-10",
