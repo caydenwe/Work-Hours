@@ -1236,11 +1236,11 @@
     "dayName": "Wednesday",
     "workStart": "07:44",
     "lunchStart": "14:45",
-    "lunchEnd": "15:30",
+    "lunchEnd": "15:45",
     "endTime": "16:20",
-    "hoursWorked": 28260,
-    "hoursLeft": 900,
-    "targetFinish": "16:05"
+    "hoursWorked": 27360,
+    "hoursLeft": 0,
+    "targetFinish": "16:20"
   },
   {
     "date": "2026-06-11",
