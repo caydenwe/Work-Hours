@@ -1257,12 +1257,12 @@
     "date": "2026-06-12",
     "dayName": "Friday",
     "workStart": "08:00",
-    "lunchStart": "07:51",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchStart": "14:30",
+    "lunchEnd": "15:30",
+    "endTime": "04:30",
+    "hoursWorked": -16200,
+    "hoursLeft": -43560,
+    "targetFinish": "16:36"
   },
   {
     "date": "2026-06-15",
