@@ -1313,11 +1313,11 @@
     "dayName": "Friday",
     "workStart": "07:50",
     "lunchStart": "14:20",
-    "lunchEnd": "15:45",
+    "lunchEnd": "15:40",
     "endTime": "16:30",
-    "hoursWorked": 26100,
-    "hoursLeft": -1260,
-    "targetFinish": "16:51"
+    "hoursWorked": 26400,
+    "hoursLeft": -960,
+    "targetFinish": "16:46"
   },
   {
     "date": "2026-06-22",
