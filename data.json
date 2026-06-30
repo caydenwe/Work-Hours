@@ -1401,11 +1401,11 @@
     "dayName": "Wednesday",
     "workStart": "07:54",
     "lunchStart": "14:30",
-    "lunchEnd": "15:30",
+    "lunchEnd": "15:19",
     "endTime": "16:00",
-    "hoursWorked": 25560,
-    "hoursLeft": -1800,
-    "targetFinish": "16:30"
+    "hoursWorked": 26220,
+    "hoursLeft": -1140,
+    "targetFinish": "16:19"
   },
   {
     "date": "2026-07-02",
