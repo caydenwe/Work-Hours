@@ -1411,12 +1411,12 @@
     "date": "2026-07-02",
     "dayName": "Thursday",
     "workStart": "08:00",
-    "lunchStart": "07:46",
-    "lunchEnd": "",
+    "lunchStart": "13:30",
+    "lunchEnd": "14:30",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "16:36"
   },
   {
     "date": "2026-07-03",
