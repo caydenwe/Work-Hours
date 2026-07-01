@@ -1410,13 +1410,13 @@
   {
     "date": "2026-07-02",
     "dayName": "Thursday",
-    "workStart": "08:00",
+    "workStart": "07:59",
     "lunchStart": "13:30",
     "lunchEnd": "14:30",
     "endTime": "16:36",
-    "hoursWorked": 27360,
-    "hoursLeft": 0,
-    "targetFinish": "16:36"
+    "hoursWorked": 27420,
+    "hoursLeft": 60,
+    "targetFinish": "16:35"
   },
   {
     "date": "2026-07-03",
