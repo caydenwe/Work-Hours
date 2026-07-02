@@ -1421,13 +1421,13 @@
   {
     "date": "2026-07-03",
     "dayName": "Friday",
-    "workStart": "08:00",
+    "workStart": "07:56",
     "lunchStart": "15:00",
     "lunchEnd": "16:00",
     "endTime": "16:30",
-    "hoursWorked": 27000,
-    "hoursLeft": -360,
-    "targetFinish": "16:36"
+    "hoursWorked": 27240,
+    "hoursLeft": -120,
+    "targetFinish": "16:32"
   },
   {
     "date": "2026-07-06",
