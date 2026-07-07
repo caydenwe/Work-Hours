@@ -1445,11 +1445,11 @@
     "dayName": "Tuesday",
     "workStart": "07:45",
     "lunchStart": "12:50",
-    "lunchEnd": "15:30",
+    "lunchEnd": "14:10",
     "endTime": "16:30",
-    "hoursWorked": 21900,
-    "hoursLeft": -5460,
-    "targetFinish": "18:01"
+    "hoursWorked": 26700,
+    "hoursLeft": -660,
+    "targetFinish": "16:41"
   },
   {
     "date": "2026-07-08",
