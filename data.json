@@ -1476,8 +1476,8 @@
   {
     "date": "2026-07-10",
     "dayName": "Friday",
-    "workStart": "16:11",
-    "lunchStart": "",
+    "workStart": "08:00",
+    "lunchStart": "16:11",
     "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
