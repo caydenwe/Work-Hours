@@ -1499,12 +1499,12 @@
     "date": "2026-07-14",
     "dayName": "Tuesday",
     "workStart": "07:57",
-    "lunchStart": "08:02",
-    "lunchEnd": "",
+    "lunchStart": "14:30",
+    "lunchEnd": "08:03",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "09:06"
   },
   {
     "date": "2026-07-15",
