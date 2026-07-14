@@ -1509,7 +1509,7 @@
   {
     "date": "2026-07-15",
     "dayName": "Wednesday",
-    "workStart": "",
+    "workStart": "07:59",
     "lunchStart": "",
     "lunchEnd": "",
     "endTime": "",
