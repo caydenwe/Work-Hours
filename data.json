@@ -1532,12 +1532,12 @@
     "date": "2026-07-17",
     "dayName": "Friday",
     "workStart": "07:42",
-    "lunchStart": "07:43",
-    "lunchEnd": "",
+    "lunchStart": "14:30",
+    "lunchEnd": "15:30",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "16:18"
   },
   {
     "date": "2026-07-20",
