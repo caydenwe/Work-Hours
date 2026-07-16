@@ -1522,11 +1522,11 @@
     "dayName": "Thursday",
     "workStart": "07:53",
     "lunchStart": "14:22",
-    "lunchEnd": "15:30",
+    "lunchEnd": "15:22",
     "endTime": "16:30",
-    "hoursWorked": 26940,
-    "hoursLeft": -420,
-    "targetFinish": "16:37"
+    "hoursWorked": 27420,
+    "hoursLeft": 60,
+    "targetFinish": "16:29"
   },
   {
     "date": "2026-07-17",
