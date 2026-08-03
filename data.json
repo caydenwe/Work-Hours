@@ -1654,11 +1654,11 @@
     "dayName": "Monday",
     "workStart": "07:57",
     "lunchStart": "13:12",
-    "lunchEnd": "14:12",
+    "lunchEnd": "14:06",
     "endTime": "16:35",
-    "hoursWorked": 27480,
-    "hoursLeft": 120,
-    "targetFinish": "16:33"
+    "hoursWorked": 27840,
+    "hoursLeft": 480,
+    "targetFinish": "16:27"
   },
   {
     "date": "2026-08-04",
