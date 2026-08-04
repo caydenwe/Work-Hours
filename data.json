@@ -1663,7 +1663,7 @@
   {
     "date": "2026-08-04",
     "dayName": "Tuesday",
-    "workStart": "",
+    "workStart": "15:01",
     "lunchStart": "",
     "lunchEnd": "",
     "endTime": "",
