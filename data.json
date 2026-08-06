@@ -1696,7 +1696,7 @@
   {
     "date": "2026-08-07",
     "dayName": "Friday",
-    "workStart": "",
+    "workStart": "08:00",
     "lunchStart": "",
     "lunchEnd": "",
     "endTime": "",
