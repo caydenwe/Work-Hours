@@ -1718,8 +1718,8 @@
   {
     "date": "2026-08-11",
     "dayName": "Tuesday",
-    "workStart": "",
-    "lunchStart": "",
+    "workStart": "08:01",
+    "lunchStart": "08:01",
     "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
