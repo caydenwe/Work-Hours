@@ -1729,7 +1729,7 @@
   {
     "date": "2026-08-12",
     "dayName": "Wednesday",
-    "workStart": "",
+    "workStart": "08:02",
     "lunchStart": "",
     "lunchEnd": "",
     "endTime": "",
