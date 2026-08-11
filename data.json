@@ -1719,12 +1719,12 @@
     "date": "2026-08-11",
     "dayName": "Tuesday",
     "workStart": "08:01",
-    "lunchStart": "14:30",
+    "lunchStart": "15:08",
     "lunchEnd": "16:08",
     "endTime": "16:30",
-    "hoursWorked": 24660,
-    "hoursLeft": -2700,
-    "targetFinish": "17:15"
+    "hoursWorked": 26940,
+    "hoursLeft": -420,
+    "targetFinish": "16:37"
   },
   {
     "date": "2026-08-12",
