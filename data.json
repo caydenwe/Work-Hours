@@ -1730,12 +1730,12 @@
     "date": "2026-08-12",
     "dayName": "Wednesday",
     "workStart": "08:02",
-    "lunchStart": "14:30",
+    "lunchStart": "14:23",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 26880,
-    "hoursLeft": -480,
-    "targetFinish": "16:38"
+    "hoursWorked": 26460,
+    "hoursLeft": -900,
+    "targetFinish": "16:45"
   },
   {
     "date": "2026-08-13",
