@@ -1731,11 +1731,11 @@
     "dayName": "Wednesday",
     "workStart": "08:02",
     "lunchStart": "14:23",
-    "lunchEnd": "15:23",
+    "lunchEnd": "15:21",
     "endTime": "16:30",
-    "hoursWorked": 26880,
-    "hoursLeft": -480,
-    "targetFinish": "16:38"
+    "hoursWorked": 27000,
+    "hoursLeft": -360,
+    "targetFinish": "16:36"
   },
   {
     "date": "2026-08-13",
