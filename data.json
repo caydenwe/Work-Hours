@@ -1752,12 +1752,12 @@
     "date": "2026-08-14",
     "dayName": "Friday",
     "workStart": "07:58",
-    "lunchStart": "",
-    "lunchEnd": "",
+    "lunchStart": "14:30",
+    "lunchEnd": "07:58",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "09:02"
   },
   {
     "date": "2026-08-17",
