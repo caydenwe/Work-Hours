@@ -1797,11 +1797,11 @@
     "dayName": "Thursday",
     "workStart": "08:10",
     "lunchStart": "14:30",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchEnd": "15:30",
+    "endTime": "16:30",
+    "hoursWorked": 26400,
+    "hoursLeft": -960,
+    "targetFinish": "16:46"
   },
   {
     "date": "2026-08-21",
