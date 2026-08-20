@@ -1796,12 +1796,12 @@
     "date": "2026-08-20",
     "dayName": "Thursday",
     "workStart": "08:10",
-    "lunchStart": "14:30",
+    "lunchStart": "14:53",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 26400,
-    "hoursLeft": -960,
-    "targetFinish": "16:46"
+    "hoursWorked": 27780,
+    "hoursLeft": 420,
+    "targetFinish": "16:23"
   },
   {
     "date": "2026-08-21",
