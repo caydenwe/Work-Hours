@@ -1806,13 +1806,13 @@
   {
     "date": "2026-08-21",
     "dayName": "Friday",
-    "workStart": "15:21",
+    "workStart": "08:00",
     "lunchStart": "14:30",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 540,
-    "hoursLeft": -26820,
-    "targetFinish": "23:57"
+    "hoursWorked": 27000,
+    "hoursLeft": -360,
+    "targetFinish": "16:36"
   },
   {
     "date": "2026-08-24",
