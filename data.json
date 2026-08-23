@@ -1817,8 +1817,8 @@
   {
     "date": "2026-08-24",
     "dayName": "Monday",
-    "workStart": "",
-    "lunchStart": "",
+    "workStart": "07:56",
+    "lunchStart": "14:30",
     "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
