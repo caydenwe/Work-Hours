@@ -1819,11 +1819,11 @@
     "dayName": "Monday",
     "workStart": "07:56",
     "lunchStart": "14:30",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchEnd": "15:30",
+    "endTime": "16:30",
+    "hoursWorked": 27240,
+    "hoursLeft": -120,
+    "targetFinish": "16:32"
   },
   {
     "date": "2026-08-25",
