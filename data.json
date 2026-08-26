@@ -1840,12 +1840,12 @@
     "date": "2026-08-26",
     "dayName": "Wednesday",
     "workStart": "08:04",
-    "lunchStart": "14:44",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchStart": "14:43",
+    "lunchEnd": "15:43",
+    "endTime": "16:30",
+    "hoursWorked": 26760,
+    "hoursLeft": -600,
+    "targetFinish": "16:40"
   },
   {
     "date": "2026-08-27",
