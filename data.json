@@ -1851,12 +1851,12 @@
     "date": "2026-08-27",
     "dayName": "Thursday",
     "workStart": "07:58",
-    "lunchStart": "02:30",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "lunchStart": "14:30",
+    "lunchEnd": "15:30",
+    "endTime": "16:30",
+    "hoursWorked": 27120,
+    "hoursLeft": -240,
+    "targetFinish": "16:34"
   },
   {
     "date": "2026-08-28",
