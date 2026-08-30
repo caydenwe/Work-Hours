@@ -1874,11 +1874,11 @@
     "dayName": "Monday",
     "workStart": "07:42",
     "lunchStart": "14:30",
-    "lunchEnd": "07:42",
+    "lunchEnd": "15:30",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": "08:30"
+    "targetFinish": "16:18"
   },
   {
     "date": "2026-09-01",
