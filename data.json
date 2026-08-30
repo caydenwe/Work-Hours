@@ -1873,12 +1873,12 @@
     "date": "2026-08-31",
     "dayName": "Monday",
     "workStart": "07:42",
-    "lunchStart": "02:30",
-    "lunchEnd": "",
+    "lunchStart": "14:30",
+    "lunchEnd": "07:42",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "08:30"
   },
   {
     "date": "2026-09-01",
