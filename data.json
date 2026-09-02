@@ -1896,11 +1896,11 @@
     "dayName": "Wednesday",
     "workStart": "07:54",
     "lunchStart": "15:40",
-    "lunchEnd": "15:30",
+    "lunchEnd": "16:30",
     "endTime": "16:30",
-    "hoursWorked": 31560,
-    "hoursLeft": 4200,
-    "targetFinish": "15:20"
+    "hoursWorked": 27960,
+    "hoursLeft": 600,
+    "targetFinish": "16:20"
   },
   {
     "date": "2026-09-03",
