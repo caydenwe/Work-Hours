@@ -1905,13 +1905,13 @@
   {
     "date": "2026-09-03",
     "dayName": "Thursday",
-    "workStart": "07:48",
+    "workStart": "07:49",
     "lunchStart": "14:30",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 27720,
-    "hoursLeft": 360,
-    "targetFinish": "16:24"
+    "hoursWorked": 27660,
+    "hoursLeft": 300,
+    "targetFinish": "16:25"
   },
   {
     "date": "2026-09-04",
