@@ -1905,8 +1905,8 @@
   {
     "date": "2026-09-03",
     "dayName": "Thursday",
-    "workStart": "",
-    "lunchStart": "",
+    "workStart": "07:48",
+    "lunchStart": "02:30",
     "lunchEnd": "",
     "endTime": "",
     "hoursWorked": 0,
