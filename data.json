@@ -1917,12 +1917,12 @@
     "date": "2026-09-04",
     "dayName": "Friday",
     "workStart": "07:52",
-    "lunchStart": "14:18",
+    "lunchStart": "15:18",
     "lunchEnd": "15:18",
     "endTime": "16:30",
-    "hoursWorked": 27480,
-    "hoursLeft": 120,
-    "targetFinish": "16:28"
+    "hoursWorked": 31080,
+    "hoursLeft": 3720,
+    "targetFinish": "15:28"
   },
   {
     "date": "2026-09-07",
