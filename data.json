@@ -1928,12 +1928,12 @@
     "date": "2026-09-07",
     "dayName": "Monday",
     "workStart": "07:42",
-    "lunchStart": "14:30",
+    "lunchStart": "14:51",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 28080,
-    "hoursLeft": 720,
-    "targetFinish": "16:18"
+    "hoursWorked": 29340,
+    "hoursLeft": 1980,
+    "targetFinish": "15:57"
   },
   {
     "date": "2026-09-08",
