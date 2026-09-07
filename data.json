@@ -1938,13 +1938,13 @@
   {
     "date": "2026-09-08",
     "dayName": "Tuesday",
-    "workStart": "",
-    "lunchStart": "",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "workStart": "07:49",
+    "lunchStart": "14:30",
+    "lunchEnd": "15:30",
+    "endTime": "04:30",
+    "hoursWorked": -15540,
+    "hoursLeft": -42900,
+    "targetFinish": "16:25"
   },
   {
     "date": "2026-09-09",
