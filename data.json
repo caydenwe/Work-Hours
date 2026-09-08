@@ -1950,12 +1950,12 @@
     "date": "2026-09-09",
     "dayName": "Wednesday",
     "workStart": "07:43",
-    "lunchStart": "07:43",
-    "lunchEnd": "",
+    "lunchStart": "14:00",
+    "lunchEnd": "07:43",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "09:02"
   },
   {
     "date": "2026-09-10",
