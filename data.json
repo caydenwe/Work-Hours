@@ -1951,11 +1951,11 @@
     "dayName": "Wednesday",
     "workStart": "07:43",
     "lunchStart": "14:32",
-    "lunchEnd": "15:32",
+    "lunchEnd": "15:35",
     "endTime": "16:30",
-    "hoursWorked": 28020,
-    "hoursLeft": 660,
-    "targetFinish": "16:19"
+    "hoursWorked": 27840,
+    "hoursLeft": 480,
+    "targetFinish": "16:22"
   },
   {
     "date": "2026-09-10",
