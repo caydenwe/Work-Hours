@@ -1971,13 +1971,13 @@
   {
     "date": "2026-09-11",
     "dayName": "Friday",
-    "workStart": "",
-    "lunchStart": "",
-    "lunchEnd": "",
+    "workStart": "07:55",
+    "lunchStart": "02:30",
+    "lunchEnd": "03:40",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "16:41"
   },
   {
     "date": "2026-09-14",
