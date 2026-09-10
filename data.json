@@ -1961,12 +1961,12 @@
     "date": "2026-09-10",
     "dayName": "Thursday",
     "workStart": "07:54",
-    "lunchStart": "14:15",
+    "lunchStart": "14:17",
     "lunchEnd": "15:15",
     "endTime": "16:30",
-    "hoursWorked": 27360,
-    "hoursLeft": 0,
-    "targetFinish": "16:30"
+    "hoursWorked": 27480,
+    "hoursLeft": 120,
+    "targetFinish": "16:28"
   },
   {
     "date": "2026-09-11",
