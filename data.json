@@ -1972,12 +1972,12 @@
     "date": "2026-09-11",
     "dayName": "Friday",
     "workStart": "07:55",
-    "lunchStart": "14:30",
+    "lunchStart": "14:18",
     "lunchEnd": "15:40",
     "endTime": "16:30",
-    "hoursWorked": 26700,
-    "hoursLeft": -660,
-    "targetFinish": "16:41"
+    "hoursWorked": 25980,
+    "hoursLeft": -1380,
+    "targetFinish": "16:53"
   },
   {
     "date": "2026-09-14",
