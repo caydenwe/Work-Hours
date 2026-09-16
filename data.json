@@ -2016,12 +2016,12 @@
     "date": "2026-09-17",
     "dayName": "Thursday",
     "workStart": "07:57",
-    "lunchStart": "",
-    "lunchEnd": "",
+    "lunchStart": "14:15",
+    "lunchEnd": "15:30",
     "endTime": "",
     "hoursWorked": 0,
     "hoursLeft": 0,
-    "targetFinish": ""
+    "targetFinish": "16:48"
   },
   {
     "date": "2026-09-18",
