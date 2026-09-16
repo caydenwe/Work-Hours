@@ -2006,11 +2006,11 @@
     "dayName": "Wednesday",
     "workStart": "07:54",
     "lunchStart": "14:00",
-    "lunchEnd": "15:58",
+    "lunchEnd": "14:58",
     "endTime": "16:30",
-    "hoursWorked": 23880,
-    "hoursLeft": -3480,
-    "targetFinish": "17:28"
+    "hoursWorked": 27480,
+    "hoursLeft": 120,
+    "targetFinish": "16:28"
   },
   {
     "date": "2026-09-17",
