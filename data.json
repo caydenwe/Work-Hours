@@ -2005,12 +2005,12 @@
     "date": "2026-09-16",
     "dayName": "Wednesday",
     "workStart": "07:54",
-    "lunchStart": "14:30",
+    "lunchStart": "14:00",
     "lunchEnd": "15:30",
     "endTime": "16:30",
-    "hoursWorked": 27360,
-    "hoursLeft": 0,
-    "targetFinish": "16:30"
+    "hoursWorked": 25560,
+    "hoursLeft": -1800,
+    "targetFinish": "17:00"
   },
   {
     "date": "2026-09-17",
