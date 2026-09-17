@@ -2017,11 +2017,11 @@
     "dayName": "Thursday",
     "workStart": "07:57",
     "lunchStart": "14:18",
-    "lunchEnd": "15:15",
+    "lunchEnd": "15:20",
     "endTime": "16:30",
-    "hoursWorked": 27360,
-    "hoursLeft": 0,
-    "targetFinish": "16:30"
+    "hoursWorked": 27060,
+    "hoursLeft": -300,
+    "targetFinish": "16:35"
   },
   {
     "date": "2026-09-18",
