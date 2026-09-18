@@ -2028,11 +2028,11 @@
     "dayName": "Friday",
     "workStart": "07:58",
     "lunchStart": "14:49",
-    "lunchEnd": "15:49",
+    "lunchEnd": "15:52",
     "endTime": "16:30",
-    "hoursWorked": 27120,
-    "hoursLeft": -240,
-    "targetFinish": "16:34"
+    "hoursWorked": 26940,
+    "hoursLeft": -420,
+    "targetFinish": "16:37"
   },
   {
     "date": "2026-09-21",
