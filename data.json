@@ -2039,11 +2039,11 @@
     "dayName": "Monday",
     "workStart": "07:56",
     "lunchStart": "14:37",
-    "lunchEnd": "15:37",
+    "lunchEnd": "15:39",
     "endTime": "16:30",
-    "hoursWorked": 27240,
-    "hoursLeft": -120,
-    "targetFinish": "16:32"
+    "hoursWorked": 27120,
+    "hoursLeft": -240,
+    "targetFinish": "16:34"
   },
   {
     "date": "2026-09-22",
