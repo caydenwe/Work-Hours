@@ -2051,9 +2051,9 @@
     "workStart": "07:59",
     "lunchStart": "14:10",
     "lunchEnd": "15:09",
-    "endTime": "16:29",
-    "hoursWorked": 27060,
-    "hoursLeft": -300,
+    "endTime": "16:28",
+    "hoursWorked": 27000,
+    "hoursLeft": -360,
     "targetFinish": "16:34"
   },
   {
