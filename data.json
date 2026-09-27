@@ -2092,13 +2092,13 @@
   {
     "date": "2026-09-28",
     "dayName": "Monday",
-    "workStart": "",
-    "lunchStart": "",
-    "lunchEnd": "",
-    "endTime": "",
-    "hoursWorked": 0,
-    "hoursLeft": 0,
-    "targetFinish": ""
+    "workStart": "07:54",
+    "lunchStart": "14:30",
+    "lunchEnd": "15:30",
+    "endTime": "07:55",
+    "hoursWorked": -3540,
+    "hoursLeft": -30900,
+    "targetFinish": "16:30"
   },
   {
     "date": "2026-09-29",
